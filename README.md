@@ -111,7 +111,7 @@ who owns it.
 
 | Week | Goal | Owner |
 |---|---|---|
-| 1 | | |
+| 1 |Designed the system, split subsystems, reviewed cdecl, and prototyped byte-0 decoding.| pls-org|
 | 2 | | |
 | 3 | | |
 | 4 | Defense | |
@@ -124,9 +124,9 @@ share one. The commit history must agree with this table.
 
 | Subsystem | Owner |
 |---|---|
-| Decode path (`decode.asm`) | |
-| Encode path (`encode.asm`) | |
-| Checksum and tests (`checksum.asm`, `tests/`) | |
+| Decode path (`decode.asm`) | Justin B. Lauricio |
+| Encode path (`encode.asm`) | Percie Louise Y. Samaniego |
+| Checksum and tests (`checksum.asm`, `tests/`) | Samantha F. Mok |
 
 ## Quirks and Issues
 
