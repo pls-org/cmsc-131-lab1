@@ -65,6 +65,15 @@ _decode_header:
         mov     esi, [ebp + 8]  ;esi <- hdr
         mov     edi, [ebp + 12] ; edi <- out
 
+        movzx   eax, byte [esi] ; eax <- byte 0   prepends byte with zeroes 
+        mov     ecx, eax        ; ecx <- eax <- byto 0 
+
+        ; extracting the high nibble (bit 7 -4)
+        shr     ecx, 4
+        and     ecx, 0x0F       ; mask ecx to extract the nibble
+        mov     [edi + 0], ecx  
+
+        
 
         popa
         mov     eax, 0
