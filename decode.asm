@@ -68,12 +68,15 @@ _decode_header:
         movzx   eax, byte [esi] ; eax <- byte 0   prepends byte with zeroes 
         mov     ecx, eax        ; ecx <- eax <- byto 0 
 
-        ; extracting the high nibble (bit 7 -4)
+        ; extracting the version (bit 7 -4)
         shr     ecx, 4
         and     ecx, 0x0F       ; mask ecx to extract the nibble
         mov     [edi + 0], ecx  
 
-        
+        ; extracting the IHL (bit 3 - 0) 
+        mov     edx, eax
+        and     edx, 0x0F 
+        mov     [edi + 4], edx
 
         popa
         mov     eax, 0
