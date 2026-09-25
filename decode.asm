@@ -62,6 +62,10 @@ _decode_header:
         ; the struct, and driver.c does the rest.
         ;
 
+        mov     esi, [ebp + 8]  ;esi <- hdr
+        mov     edi, [ebp + 12] ; edi <- out
+
+
         popa
         mov     eax, 0
         leave
