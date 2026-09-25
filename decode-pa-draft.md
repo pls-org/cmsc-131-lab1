@@ -87,6 +87,4 @@ padding):
 With the struct pointer in `edi`, a 32-bit field is a plain store —
 `mov [edi+16], eax` for `total_length` — and each source/destination
 octet is a single-byte store, `mov [edi+44], al` for the first byte of
-`src`. This table is `driver.c`'s own comment, not a guess; if `decode.asm`
-and `driver.c` ever disagree, `driver.c` wins, since it's the fixture the
-grader diffs against.
+`src`.
