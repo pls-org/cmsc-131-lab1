@@ -110,8 +110,6 @@ The main problems for the test fixtures are:
 
 ### Solution architecture
 
-#### Encode Solution Architecture
-
 `encode_header` in `encode.asm` gets the struct from `[ebp+8]` and the 20-byte header buffer from `[ebp+12]`. It uses the same offsets defined in `driver.c`.
 
 The encoder is basically the reverse of the decoder. Instead of shifting and masking bits to get the field values, it shifts the values into the correct position and ORs them together.
