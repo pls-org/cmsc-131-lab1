@@ -42,6 +42,8 @@ _ip_checksum:
         enter   0,0
         pusha
 
+        ; registers to be preserved here
+
         ;
         ; TODO: the checksum loop.
         ;
@@ -50,17 +52,44 @@ _ip_checksum:
         ;   1. Treat the header as 16-bit big-endian words. Load each byte
         ;      pair and recombine. Never load the pair as a single 16-bit
         ;      value, which gives you the bytes reversed.
+
+
         ;   2. Add each word to a 32-bit accumulator. Keep the carries. The
         ;      fold below returns them to the sum.
+
+        xor eax, eax    ; set eax to 0
+        sum_loop:
+                cmp     ecx, 0
+                jle     fold
+                movzx   ebx, byte[esi]
+                shl     ebx, 8
+                movzx   edx, byte[esi + 1]
+                or      ebx, edx
+                add     eax, ebx        ; 32-bit accumulator
+                add     esi, 2
+                sub     ecx, 2
+                jmp     sum_loop
+
         ;   3. While the accumulator exceeds 16 bits, add its high half to
         ;      its low half. This is the end-around carry. A large sum can
         ;      need the fold twice.
+
+        fold:
+                ; while (eax >> 16) != 0: eax = (eax & 0xFFFF) + (eax >> 16)
+                ; to be done
+
         ;   4. NOT the low 16 bits. That is the checksum.
+
+                not     eax
+                and     eax, 0xFFFF
+
         ;
         ; len is always even, since the driver calls this with 20. A loop
         ; that consumes two bytes per iteration and stops on ecx == 0 is
         ; enough. Leave the answer in ax when you return.
         ;
+
+        ; registers to save 
 
         popa
         mov     eax, 0
