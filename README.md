@@ -1,4 +1,5 @@
 <!--no-pdf-->
+
 # CMSC 131 Lab 1 Starter
 
 Decode, encode, and checksum 20-byte IPv4 packet headers under a C driver.
@@ -92,19 +93,28 @@ not edits.
 
 ### Problem analysis
 
-#### Encoder's Problem Analysis
-
 renpkt's encoder gets the field values from the struct made by `driver.c` and packs them into the 20-byte IPv4 header. The main problems are that some fields share the same byte, like `dscp` + `ecn` and `flags` + `fragment_offset`, the multi-byte fields need to be stored in big-endian, and the checksum needs to be calculated after the whole header is complete.
 
-### Solution architecture
+`checksum.asm` and the `tests/` suite are responsible for verifying packet integrity and guaranteeing overall correctness.
 
-#### Encode Solution Architecture
+The main problems for the checksum routine are:
+
+- **Folding & One's Complement:** Summing ten 16-bit big-endian words into a 32-bit accumulator accumulates carries in the top 16 bits. These must be repeatedly folded back into the bottom 16 bits until the upper half is zero.
+- **Endianness & Dual-Path Reuse:** The function must read raw 16-bit big-endian words without bugs and apply bitwise `NOT` at the end.
+- **Register Preservation:** Standard x86 calling conventions require preserving `ebx`, `esi`, `edi`, and `ebp`.
+
+The main problems for the test fixtures are:
+
+- **Edge-Case Coverage:** Test cases must cover valid packets, invalid checksums, non-zero fragment offsets.
+- **Test Suite Alignment:** Every binary fixture (`.bin`), expected output, and `manifest.txt` entry (`valid` vs `invalid`) must stay synchronized across both the decoding shell script pass and the C `contract_test` pass.
+
+### Solution architecture
 
 `encode_header` in `encode.asm` gets the struct from `[ebp+8]` and the 20-byte header buffer from `[ebp+12]`. It uses the same offsets defined in `driver.c`.
 
 The encoder is basically the reverse of the decoder. Instead of shifting and masking bits to get the field values, it shifts the values into the correct position and ORs them together.
 
-##### Build Order  
+##### Build Order
 
 1. **Byte 0:** `(version << 4) | ihl`
 2. **Byte 1:** `(dscp << 2) | ecn`
@@ -119,17 +129,28 @@ The encoder is basically the reverse of the decoder. Instead of shifting and mas
 
 The checksum has to be done last because it uses the entire header. All the other fields need to be written first.
 
+`ip_checksum` in `checksum.asm` takes the 20-byte header buffer from `[ebp+8]` and the length from `[ebp+12]` (which is 20) to use as a loop counter.
+
+##### Computation Order
+
+1. **Accumulator Setup:** The `eax` register is set to 0 to hold the running 32-bit total.
+2. **Sum Loop:** A loop reads two bytes at a time, assembles them into 16-bit big-endian values, and adds them to `eax`. This is done until all bytes have been processed, with `eax` keeping any overflow safely in its upper 16 bits.
+3. **Fold Loop:** A loop creates the one's complement sum. While the top half of `eax` (bits 16-31) has a value, it is shifted right and added back to the bottom half. This repeats until the top half is exactly 0.
+4. **Bit Flip:** The `NOT` instruction is applied to `eax` so the bits can be flipped to take the final one's complement.
+5. **Masking:** `eax` is masked with `0xFFFF` so the final result is a 16-bit value.
+6. **Return:** The function returns this final number. It is up to the main program to check this return value.
+
 ### Timeline
 
 One line per week. Name the subsystem each week finishes and the member
 who owns it.
 
-| Week | Goal | Owner |
-|---|---|---|
-| 1 |Designed the system, split subsystems, reviewed cdecl, and prototyped byte-0 decoding.| pls-org|
-| 2 | | |
-| 3 | | |
-| 4 | Defense | |
+| Week | Goal                                                                                   | Owner   |
+| ---- | -------------------------------------------------------------------------------------- | ------- |
+| 1    | Designed the system, split subsystems, reviewed cdecl, and prototyped byte-0 decoding. | pls-org |
+| 2    |                                                                                        |         |
+| 3    |                                                                                        |         |
+| 4    | Defense                                                                                |         |
 
 ## Subsystem Ownership
 
@@ -137,11 +158,11 @@ Complete this section before the Week 1 progress report. The manual lists
 the three subsystems. Each member owns one. In a group of four, two members
 share one. The commit history must agree with this table.
 
-| Subsystem | Owner |
-|---|---|
-| Decode path (`decode.asm`) | Justin B. Lauricio |
-| Encode path (`encode.asm`) | Percie Louise Y. Samaniego |
-| Checksum and tests (`checksum.asm`, `tests/`) | Samantha F. Mok |
+| Subsystem                                     | Owner                      |
+| --------------------------------------------- | -------------------------- |
+| Decode path (`decode.asm`)                    | Justin B. Lauricio         |
+| Encode path (`encode.asm`)                    | Percie Louise Y. Samaniego |
+| Checksum and tests (`checksum.asm`, `tests/`) | Samantha F. Mok            |
 
 ## Quirks and Issues
 
@@ -152,8 +173,8 @@ did about it.
 
 ### Known issues
 
-- 
+-
 
 ### Quirks
 
-- 
+-
