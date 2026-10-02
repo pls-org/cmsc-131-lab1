@@ -109,6 +109,22 @@ _decode_header:
         or      eax, ecx                ; eax <- combined 16-bit value
         mov     [edi + 20], eax         ; out -> identification
 
+        ; ----------- BYTE 6-7 (flags + fragment_offset) ----------------------
+
+        ; split byte-by-byte, because the 13-bit field straddles both bytes.
+        ; recombine first
+        movzx   eax, byte [esi + 6]    ; eax <- byte 6 (high byte)
+        shl     eax, 8
+        movzx   ecx, byte [esi + 7]    ; ecx <- byte 7 (low byte)
+        or      eax, ecx               ; eax <- combined 16-bit word
+
+        ; extracting flags (bits 15 - 13 of the word)
+        mov     ecx, eax
+        shr     ecx, 13                ; bits 15-13 -> bits 2-0
+        and     ecx, 0x07              ; mask to extract the 3 bits
+        mov     [edi + 24], ecx        ; out -> flags
+
+
         popa
         mov     eax, 0
         leave
