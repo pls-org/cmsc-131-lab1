@@ -137,6 +137,14 @@ _decode_header:
         movzx  eax, byte [esi + 9]     ; eax <- byte 9
         mov    [edi + 36], eax         ; out -> protocol
 
+        ; ----------------- BYTE 10 - 11 (checksum) ------------------------
+        ; recombination of byte 10 and 11
+        movzx   eax, byte [esi + 10]    ; eax <- byte 10
+        shl     eax, 8                  ; shift left to accomodate byte 11
+        movzx   ecx, byte [esi + 11]    ; ecx <- byte 11
+        or      eax, ecx                ; eax <- 16-bit combination word
+        mov     [edi + 40], eax         ; out -> checksum
+
 
         popa
         mov     eax, 0
