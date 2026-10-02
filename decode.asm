@@ -66,17 +66,28 @@ _decode_header:
         mov     edi, [ebp + 12] ; edi <- out
 
         movzx   eax, byte [esi] ; eax <- byte 0   prepends byte with zeroes 
-        mov     ecx, eax        ; ecx <- eax <- byto 0 
+        mov     ecx, eax        ; ecx <- eax <- byte 0 
 
-        ; extracting the version (bit 7 -4)
+        ; --------- BYTE 0 ----------------------------------------
+        ; extracting the version (high nibble)
         shr     ecx, 4
         and     ecx, 0x0F       ; mask ecx to extract the nibble
-        mov     [edi + 0], ecx  
+        mov     [edi + 0], ecx  ; out -> version
 
         ; extracting the IHL (bit 3 - 0) 
         mov     edx, eax
         and     edx, 0x0F 
         mov     [edi + 4], edx
+
+        ; ---------- BYTE 1 ----------------------------------------------------
+        movzx   eax, byte [esi + 1]     ; eax <- byte 1 (prepends byte with 0s)
+        mov     ecx, eax                ; ecx <- eax <- byte 1
+
+        ; extracting dscp (bits 7 -2)
+        shr     ecx, 2                  ; bits 7-2 -> bits 5-0
+        and     ecx, 0x3F               ; mask to extract the 6 bits
+        mov     [edi + 8], ecx          ; out -> dcsp
+
 
         popa
         mov     eax, 0
