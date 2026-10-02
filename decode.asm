@@ -124,6 +124,10 @@ _decode_header:
         and     ecx, 0x07              ; mask to extract the 3 bits
         mov     [edi + 24], ecx        ; out -> flags
 
+        ; extracting fragment_offset (bits 12 - 0 of the word)
+        mov     edx, eax
+        and     edx, 0x1FFF            ; mask to extract the 13 bits
+        mov     [edi + 28], edx        ; out -> fragment_offset
 
         popa
         mov     eax, 0
