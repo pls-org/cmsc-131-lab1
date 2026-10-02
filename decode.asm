@@ -129,6 +129,15 @@ _decode_header:
         and     edx, 0x1FFF            ; mask to extract the 13 bits
         mov     [edi + 28], edx        ; out -> fragment_offset
 
+        ; ----------------- BYTE 8 (ttl) ---------------------------------
+        movzx   eax, byte [esi + 8]    ; eax <- byte 8
+        mov     [edi + 32], eax        ; out -> ttl
+
+        ; ----------------- BYTE 9 (protocol) ---------------------------------
+        movzx  eax, byte [esi + 9]     ; eax <- byte 9
+        mov    [edi + 36], eax         ; out -> protocol
+
+
         popa
         mov     eax, 0
         leave
