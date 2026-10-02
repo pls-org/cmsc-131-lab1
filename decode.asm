@@ -145,6 +145,33 @@ _decode_header:
         or      eax, ecx                ; eax <- 16-bit combination word
         mov     [edi + 40], eax         ; out -> checksum
 
+        ; ----------------- BYTE 12 - 15 (src) -----------------------------
+        ; four independent octets, no recombination
+        movzx   eax, byte [esi + 12]    ; eax <- byte 12
+        mov     [edi + 44], al           
+
+        movzx   eax, byte [esi + 13]    ; eax <- byte 13
+        mov     [edi + 45], al   
+
+        movzx   eax, byte [esi + 14]    ; eax <- byte 14
+        mov     [edi + 46], al   
+
+        movzx   eax, byte [esi + 15]    ; eax <- byte 15
+        mov     [edi + 47], al   
+
+        ; ----------------- BYTE 16 - 19 (src) -----------------------------
+        ; four independent octets, no recombination
+        movzx   eax, byte [esi + 16]    ; eax <- byte 16
+        mov     [edi + 48], al           
+
+        movzx   eax, byte [esi + 17]    ; eax <- byte 17
+        mov     [edi + 49], al   
+
+        movzx   eax, byte [esi + 18]    ; eax <- byte 18
+        mov     [edi + 50], al   
+
+        movzx   eax, byte [esi + 19]    ; eax <- byte 19
+        mov     [edi + 51], al   
 
         popa
         mov     eax, 0
