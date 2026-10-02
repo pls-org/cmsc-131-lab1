@@ -102,6 +102,13 @@ _decode_header:
         or      eax, ecx                ; eax <- combined 16-bit value
         mov     [edi + 16], eax         ; out -> total_length
 
+        ; ------------- BYTES 4-5 (identification) ---------------------------
+        movzx   eax, byte [esi + 4]     ; eax <- byte 4 (high byte)
+        shl     eax, 8                  ; shift left 8 to make room for low byte
+        movzx   ecx, byte [esi + 5]     ; ecx <- byte 5 (low byte)
+        or      eax, ecx                ; eax <- combined 16-bit value
+        mov     [edi + 20], eax         ; out -> identification
+
         popa
         mov     eax, 0
         leave
