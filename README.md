@@ -148,7 +148,7 @@ who owns it.
 | Week | Goal                                                                                   | Owner   |
 | ---- | -------------------------------------------------------------------------------------- | ------- |
 | 1    | Designed the system, split subsystems, reviewed cdecl, and prototyped byte-0 decoding. | pls-org |
-| 2    |                                                                                        |         |
+| 2    | Completed the decode header, implemented the checksum routine and encoder              | pls-org |
 | 3    |                                                                                        |         |
 | 4    | Defense                                                                                |         |
 
