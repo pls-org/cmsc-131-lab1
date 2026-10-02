@@ -92,7 +92,15 @@ _decode_header:
         mov     edx, eax
         and     edx, 0x03               ; mast to extract the 2 bits
         mov     [edi + 12], edx         ; out -> ecn
-        
+
+
+        ; ------------- BYTES 2-3 (total_length) -----------------------------
+        movzx   eax, byte [esi + 2]     ; eax <- byte 2 (high byte)
+        shl     eax, 8                  ; shift left 8 to make room for low byte
+
+        movzx   ecx, byte [esi + 3]     ; ecx <- byte 3 (low byte)
+        or      eax, ecx                ; eax <- combined 16-bit value
+        mov     [edi + 16], eax         ; out -> total_length
 
         popa
         mov     eax, 0
