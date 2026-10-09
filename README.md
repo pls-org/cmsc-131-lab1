@@ -173,8 +173,25 @@ did about it.
 
 ### Known issues
 
--
+#### Decode Subsystem
+
+- Mixing up flags and fragment offset. They share bytes 6–7. An incorrect shift or mask could put flag bits into the offset, or vice versa.
+
+- Writing fields to the wrong struct offsets or widths. Numeric fields are 4-byte unsigned ints, while the source and destination addresses are byte arrays. Using the wrong store size or offset could corrupt neighboring fields.
+
+- Forgetting to restore ESI or EDI. They’re useful for holding the input-buffer and output-struct pointers, but cdecl requires them to have their original values when the function returns.
 
 ### Quirks
 
--
+#### Decode Subsystem
+
+- The driver reads exactly 20 bytes and passes that buffer to `decode_header`. If the file is shorter, the driver reports a read error before your assembly runs. If it’s longer, the extra bytes aren’t used. Even if the IHL field says the header has options, this lab doesn’t decode them—the assembly has no length argument and is designed for the 20-byte base header. See `driver.c`.
+
+- Decode extracts, it doesn’t validate. It preserves the raw IHL, version, and all three flag bits. The driver calculates checksum validity separately and still prints decoded fields when the checksum is invalid.
+
+- After combining bytes 6 and 7 in network order, bits 15–13 are the flags and bits 12–0 are the fragment offset. Extracting flags means shifting right 13 and keeping 3 bits; extracting the offset means keeping the low 13 bits. The mask matters: the two values are neighbors in the same word, so a mask that’s too wide can mix them up.
+
+- The decode tests compare the program’s printed text with expected files. A separate contract test checks that valid headers survive decode-then-encode and that the assembly routines preserve required registers. A header is included in that round-trip test only if its entry in `tests/manifest.txt` says `valid`. Running `make check` runs both kinds of checks.
+
+-  Each numeric field in the C struct is a 4-byte `unsigned int`, even when the value itself is only 8 or 16 bits. The address fields, by contrast, are byte arrays. So store decoded numbers as 32-bit values at the documented struct offsets, but store each address octet separately.
+
