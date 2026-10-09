@@ -14,3 +14,7 @@ sample03 valid
 sample04 valid
 sample05 valid
 bad01 invalid
+sample_max valid
+sample_min_none valid
+sample_df_flag_offset1 valid
+sample_mf_flag valid

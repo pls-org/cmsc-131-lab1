@@ -1,0 +1,14 @@
+Version:          4
+IHL:              5 (20 bytes)
+DSCP:             63
+ECN:              3
+Total Length:     65535
+Identification:   43981
+Flags:            3 (DF) (MF)
+Fragment Offset:  8191
+TTL:              255
+Protocol:         6 (TCP)
+Header Checksum:  0x7B29
+Source:           10.0.0.1
+Destination:      10.0.0.2
+Checksum:         VALID
