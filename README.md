@@ -181,6 +181,10 @@ did about it.
 
 - Forgetting to restore ESI or EDI. They’re useful for holding the input-buffer and output-struct pointers, but cdecl requires them to have their original values when the function returns.
 
+#### Encode: 
+- The encoder does not check the reserved flag bit. It flag values from 4 to 7, which are invalid. The driver already rejects these values, but changing the mask from 07h to 03h would make the encoder safer. 
+- The encoder does not write IP options. The encoder always creates a 20-byte header, even if IHL indicates a longer one. This is acceptable because the driver always sets IHL to 5.
+
 ### Quirks
 
 #### Decode Subsystem
