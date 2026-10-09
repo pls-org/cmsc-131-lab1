@@ -40,24 +40,17 @@ segment .text
         global  _ip_checksum
 _ip_checksum:
         enter   0,0
-        pusha
+        
+        ; preserve registers
+        push    ebx
+        push    esi
+        push    edi
 
-        ; registers to be preserved here
+        mov     esi, [ebp+8]    ; 20-byte header
+        mov     ecx, [ebp+12]   ; length (20)
 
-        ;
-        ; TODO: the checksum loop.
-        ;
-        ; The manual's recipe:
-        ;
-        ;   1. Treat the header as 16-bit big-endian words. Load each byte
-        ;      pair and recombine. Never load the pair as a single 16-bit
-        ;      value, which gives you the bytes reversed.
+        xor eax, eax    ; set eax to 0 for accumulator
 
-
-        ;   2. Add each word to a 32-bit accumulator. Keep the carries. The
-        ;      fold below returns them to the sum.
-
-        xor eax, eax    ; set eax to 0
         sum_loop:
                 cmp     ecx, 0
                 jle     fold
@@ -70,16 +63,18 @@ _ip_checksum:
                 sub     ecx, 2
                 jmp     sum_loop
 
-        ;   3. While the accumulator exceeds 16 bits, add its high half to
-        ;      its low half. This is the end-around carry. A large sum can
-        ;      need the fold twice.
-
         fold:
-                ; while (eax >> 16) != 0: eax = (eax & 0xFFFF) + (eax >> 16)
-                ; to be done
+                mov     edx, eax
+                shr     edx, 16
+                test    edx, edx
+                jz      fold_done
 
+                and     eax, 0xFFFF
+                add     eax, edx
+                jmp     fold
+
+        fold_done:
         ;   4. NOT the low 16 bits. That is the checksum.
-
                 not     eax
                 and     eax, 0xFFFF
 
@@ -89,9 +84,10 @@ _ip_checksum:
         ; enough. Leave the answer in ax when you return.
         ;
 
-        ; registers to save 
+        ; restore registers
+        pop     edi
+        pop     esi
+        pop     ebx
 
-        popa
-        mov     eax, 0
         leave
         ret
