@@ -181,6 +181,10 @@ did about it.
 
 - Forgetting to restore ESI or EDI. They’re useful for holding the input-buffer and output-struct pointers, but cdecl requires them to have their original values when the function returns.
 
+#### Encode: 
+- The encoder does not check the reserved flag bit. It flag values from 4 to 7, which are invalid. The driver already rejects these values, but changing the mask from 07h to 03h would make the encoder safer. 
+- The encoder does not write IP options. The encoder always creates a 20-byte header, even if IHL indicates a longer one. This is acceptable because the driver always sets IHL to 5.
+
 ### Quirks
 
 #### Decode Subsystem
@@ -195,9 +199,6 @@ did about it.
 
 -  Each numeric field in the C struct is a 4-byte `unsigned int`, even when the value itself is only 8 or 16 bits. The address fields, by contrast, are byte arrays. So store decoded numbers as 32-bit values at the documented struct offsets, but store each address octet separately.
 
-#### Encode: 
-- The encoder does not check the reserved flag bit. It flag values from 4 to 7, which are invalid. The driver already rejects these values, but changing the mask from 07h to 03h would make the encoder safer. 
-- The encoder does not write IP options. The encoder always creates a 20-byte header, even if IHL indicates a longer one. This is acceptable because the driver always sets IHL to 5.
 
 #### Encode: 
 - It calculates a new checksum instead od using the one in the struct. As it sets the checksum bytes to 0, calculates the new output using the ip_checksum and it stores result in the header to avoid using outdated data.
