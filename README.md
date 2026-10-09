@@ -149,7 +149,7 @@ who owns it.
 | ---- | -------------------------------------------------------------------------------------- | ------- |
 | 1    | Designed the system, split subsystems, reviewed cdecl, and prototyped byte-0 decoding. | pls-org |
 | 2    | Completed the decode header, implemented the checksum routine and encoder              | pls-org |
-| 3    |                                                                                        |         |
+| 3    | Implemented additional headers, finished tests and quirk/known issues documentation    | pls-org |
 | 4    | Defense                                                                                |         |
 
 ## Subsystem Ownership
@@ -185,3 +185,13 @@ did about it.
 - IP Addresses are copied directly into the header. I copied the 4 address bytes without reanrranging them because the struct already store them in the correct order
 - The routine always returns 0 and saves all registers.
 - I depended on the checksum in terms of checking if the encode is correct. 
+
+#### Checksum Header:
+- The checksum could produce a carry bit at the end, which can affect the math accuracy for one's complement. The implementation folds the carry twice to deal with this.
+
+- Each register used should be subsequentially preserved and restored, since using the conventional pusha/popa can result in overwriting important values and messing up the call stack. For this, the registers are individually pushed and popped based on their order. 
+
+#### Tests:
+- The `tests/manifest.txt` and all `tests/expected/NAME.out` files require a newline at the end of each file to prevent the running check from skipping cases or ignoring the last line. All the files have been padded with a newline for this measure.
+
+- `tests/NAME.bin` and `tests/expected/NAME.out` file names must match each other byte-for-byte, otherwise the --decode testing could be skipped during checking, but the round trip phase could still be running.
