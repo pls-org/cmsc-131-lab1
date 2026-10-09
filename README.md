@@ -173,8 +173,15 @@ did about it.
 
 ### Known issues
 
--
+#### Encode: 
+- The encoder does not check the reserved flag bit. It flag values from 4 to 7, which are invalid. The driver already rejects these values, but changing the mask from 07h to 03h would make the encoder safer. 
+- The encoder does not write IP options. The encoder always creates a 20-byte header, even if IHL indicates a longer one. This is acceptable because the driver always sets IHL to 5.
 
 ### Quirks
 
--
+#### Encode: 
+- It calculates a new checksum instead od using the one in the struct. As it sets the checksum bytes to 0, calculates the new output using the ip_checksum and it stores result in the header to avoid using outdated data.
+- Values that are too large are shortened instead of rejected. Encode uses masks to keep only the bits that fits into the field. 
+- IP Addresses are copied directly into the header. I copied the 4 address bytes without reanrranging them because the struct already store them in the correct order
+- The routine always returns 0 and saves all registers.
+- I depended on the checksum in terms of checking if the encode is correct. 
